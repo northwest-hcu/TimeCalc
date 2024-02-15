@@ -17,13 +17,6 @@
         padding: 20px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
       }
-      input, button {
-        margin-top: 10px;
-        margin-bottom: 10px;
-        display: block;
-        width: 100%;
-        padding: 10px;
-      }
       .box {
         text-align: center;
       }
@@ -59,7 +52,6 @@
         width: 30px;
         height: 30px;
         border-radius: 50%;
-        background-color:  rgb(200, 50, 50);
         padding: 2px;
         cursor: pointer;
         display: inline-flex;
@@ -70,9 +62,24 @@
         font-weight: 600;
         user-select: none;
       }
-      .icon-btn:hover {
-        background-color: rgb(240, 50, 50);
-        transition: background-color 0.5s;
+      .add-btn {
+        background-color:  rgb(200, 50, 50);
+      }
+      .remove-btn {
+        background-color:  rgb(50, 50, 200);
+      }
+      #err-msg:not(.no-see) {
+        color: red;
+      }
+      .no-see {
+        color: rgba(0,0,0,0);
+      }
+      #result {
+        text-align: right;
+        display: inline-block;
+        width: 120px;
+        padding: 10px;
+        margin: 5px;
       }
     </style>
   </head>
@@ -80,19 +87,19 @@
     <div id="container">
       <h1>相対時間計算ツール</h1>
       <div class="box">
-        <input type="text" id="input-time-string" placeholder="00:00" value="00:30" class="time-string">
-        <span class="icon-btn" id="add-time-string-btn">+</span>
+        <div id="result">合計 00:00</div>
       </div>
-      <div>
-        <div id="execute" class="btn">計算</div>
+      <div class="box">
+        <input type="text" id="input-time-string" placeholder="??:??" value="00:30" class="time-string">
+        <span class="icon-btn add-btn" id="add-time-string-btn">+</span>
       </div>
+      <p id="err-msg" class="no-see">入力表記が間違っています. ??:??の形式で0埋めで入力してください.</p>
     </div>
 
     <script>
       /* to check validation ??:?? */
       function checkValidate(time_string) {
-    		const isValid = /^([0-9]{2,}):[0-5][0-9]$/.test(time_string);
-        console.log(isValid);
+    		const isValid = /^([0-9]{2,}):{1}[0-5][0-9]$/.test(time_string);
         return isValid;
 			}
 
@@ -102,9 +109,24 @@
       }
 
       function sum2TimeString(sum) {
-        const hour = parseInt(sum / 60);
-        const minute = parseInt(sum % 60);
+        let hour = parseInt(sum / 60);
+        let minute = parseInt(sum % 60);
+        if (hour < 10) hour = '0' + hour;
+        if (minute < 10) minute = '0' + minute;
         return hour + ':' + minute;
+      }
+
+      function setRemoveBtn(elem) {
+        const icon_btn = document.createElement('span');
+        icon_btn.innerHTML = 'x';
+        icon_btn.classList.add('icon-btn');
+        icon_btn.classList.add('remove-btn');
+
+        elem.appendChild(icon_btn);
+        icon_btn.addEventListener('click', function(){
+          elem.outerHTML = '';
+          calcSum();
+        }, false);
       }
 
       function createTimeStringElem(time_string) {
@@ -114,24 +136,44 @@
         box.appendChild(elem);
         box.classList.add('box');
         elem.classList.add('time-string');
+        setRemoveBtn(box);
         return box;
       }
 
       function addTimeStringElem(time_string, elem_id='container') {
-        if(! checkValidate(time_string)) return;
+        if (! checkValidate(time_string)) return;
         const elem = document.getElementById(elem_id);
-        console.log(elem);
         elem.appendChild(createTimeStringElem(time_string));
       }
 
       function inputCheckValidate() {
+        const time_string = document.getElementById('input-time-string').value;
+        const err_msg = document.getElementById('err-msg');
+        if (checkValidate(time_string)) {
+          err_msg.classList.add('no-see');
+        } else {
+          err_msg.classList.remove('no-see');
+        }
+      }
 
-      } 
+      function calcSum() {
+        const time_strings = document.querySelectorAll('div.time-string');
+        let sum = 0;
+        for (let i = 0; i < time_strings.length; i++) {
+          sum += timeString2Sum(time_strings[i].innerHTML);
+        }
+        const result = document.getElementById('result');
+        const result_sum = sum2TimeString(sum);
+        result.innerHTML = `合計 ${result_sum}`;
+      }
 
       document.getElementById('add-time-string-btn').addEventListener('click', function(){
         const time_string = document.getElementById('input-time-string').value;
         addTimeStringElem(time_string);
+        calcSum();
       }, false);
+
+      document.getElementById('input-time-string').addEventListener('keyup', inputCheckValidate, false);
 
 		</script>
   </body>
