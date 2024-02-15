@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>相対時間計算ツール</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 0;
+    background-color: #f9f9f9;
+  }
+  .container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  input, button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    width: 100%;
+    padding: 10px;
+  }
+  #result {
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>相対時間計算ツール</h1>
+  <label for="datetime1">日時1:</label>
+  <input type="datetime-local" id="datetime1">
+  <label for="datetime2">日時2:</label>
+  <input type="datetime-local" id="datetime2">
+  <button onclick="calculateDifference()">計算</button>
+  <div id="result"></div>
+</div>
+
+<script>
+function calculateDifference() {
+  var datetime1 = document.getElementById('datetime1').value;
+  var datetime2 = document.getElementById('datetime2').value;
+  var date1 = new Date(datetime1);
+  var date2 = new Date(datetime2);
+  var diff = date2 - date1;
+  var diffInHours = diff / (1000 * 60 * 60);
+  var diffInDays = diff / (1000 * 60 * 60 * 24);
+  document.getElementById('result').innerHTML = `差: ${diffInHours.toFixed(2)} 時間 (${diffInDays.toFixed(2)} 日)`;
+}
+</script>
+</body>
+</html>
