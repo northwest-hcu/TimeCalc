@@ -1,56 +1,138 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="utf-8">
-<title>相対時間計算ツール</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    padding: 0;
-    background-color: #f9f9f9;
-  }
-  .container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  input, button {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: block;
-    width: 100%;
-    padding: 10px;
-  }
-  #result {
-    margin-top: 20px;
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <h1>相対時間計算ツール</h1>
-  <label for="datetime1">日時1:</label>
-  <input type="datetime-local" id="datetime1">
-  <label for="datetime2">日時2:</label>
-  <input type="datetime-local" id="datetime2">
-  <button onclick="calculateDifference()">計算</button>
-  <div id="result"></div>
-</div>
+  <head>
+    <meta charset="utf-8">
+    <title>相対時間計算ツール</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      #container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      input, button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: block;
+        width: 100%;
+        padding: 10px;
+      }
+      .box {
+        text-align: center;
+      }
+      .time-string:hover {
+        background-color: rgb(240, 240, 240);
+        transition: background-color 0.5s;
+      }
+      .time-string {
+        text-align: right;
+        display: inline-block;
+        width: 60px;
+        padding: 10px;
+        margin: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        user-select: none;
+        cursor: pointer;
+        border: 1px solid rgba(0,0,0,0.2);
+        background-color: rgb(255, 255, 255);
+      }
+      #input-time-string {
+        font-size: 16px;
+        border: 2px solid black;
+      }
+      #input-time-string:focus {
+        font-size: 16px;
+        border: 2px solid rgb(50, 50, 200);
+        outline: 0px;
+        transition: border 0s;
+      }
+      .icon-btn {
+        margin: 9px;
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color:  rgb(200, 50, 50);
+        padding: 2px;
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: white;
+        font-weight: 600;
+        user-select: none;
+      }
+      .icon-btn:hover {
+        background-color: rgb(240, 50, 50);
+        transition: background-color 0.5s;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>相対時間計算ツール</h1>
+      <div class="box">
+        <input type="text" id="input-time-string" placeholder="00:00" value="00:30" class="time-string">
+        <span class="icon-btn" id="add-time-string-btn">+</span>
+      </div>
+      <div>
+        <div id="execute" class="btn">計算</div>
+      </div>
+    </div>
 
-<script>
-function calculateDifference() {
-  var datetime1 = document.getElementById('datetime1').value;
-  var datetime2 = document.getElementById('datetime2').value;
-  var date1 = new Date(datetime1);
-  var date2 = new Date(datetime2);
-  var diff = date2 - date1;
-  var diffInHours = diff / (1000 * 60 * 60);
-  var diffInDays = diff / (1000 * 60 * 60 * 24);
-  document.getElementById('result').innerHTML = `差: ${diffInHours.toFixed(2)} 時間 (${diffInDays.toFixed(2)} 日)`;
-}
-</script>
-</body>
+    <script>
+      /* to check validation ??:?? */
+      function checkValidate(time_string) {
+    		const isValid = /^([0-9]{2,}):[0-5][0-9]$/.test(time_string);
+        console.log(isValid);
+        return isValid;
+			}
+
+      function timeString2Sum(time_string) {
+        const time_value = time_string.split(':');
+        return parseInt(time_value[0]) * 60 + parseInt(time_value[1]);
+      }
+
+      function sum2TimeString(sum) {
+        const hour = parseInt(sum / 60);
+        const minute = parseInt(sum % 60);
+        return hour + ':' + minute;
+      }
+
+      function createTimeStringElem(time_string) {
+        const elem = document.createElement('div');
+        const box = document.createElement('div');
+        elem.innerHTML = time_string;
+        box.appendChild(elem);
+        box.classList.add('box');
+        elem.classList.add('time-string');
+        return box;
+      }
+
+      function addTimeStringElem(time_string, elem_id='container') {
+        if(! checkValidate(time_string)) return;
+        const elem = document.getElementById(elem_id);
+        console.log(elem);
+        elem.appendChild(createTimeStringElem(time_string));
+      }
+
+      function inputCheckValidate() {
+
+      } 
+
+      document.getElementById('add-time-string-btn').addEventListener('click', function(){
+        const time_string = document.getElementById('input-time-string').value;
+        addTimeStringElem(time_string);
+      }, false);
+
+		</script>
+  </body>
 </html>
